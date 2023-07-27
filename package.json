@@ -1,0 +1,42 @@
+{
+  "name": "@dev.yuvi/generate-project-template",
+  "version": "0.0.1",
+  "description": "Simple project template generator.",
+  "main": "dist/index.js",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && npx tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "keywords": [
+    "project",
+    "template",
+    "generator",
+    "node",
+    "express",
+    "typescript"
+  ],
+  "author": "Yuvraj Gill",
+  "license": "MIT",
+  "homepage": "https://github.com/yuvi90/template-node-express.git#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuvi90/template-node-express.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yuvi90/template-node-express.git/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.5",
+    "@typescript-eslint/eslint-plugin": "^6.2.0",
+    "@typescript-eslint/parser": "^6.2.0",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
+    "rimraf": "^5.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  }
+}

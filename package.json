@@ -1,5 +1,5 @@
 {
-  "name": "@dev.yuvi/generate-project-template",
+  "name": "@yuvi92/generate-project-template",
   "version": "0.0.1",
   "description": "Simple project template generator.",
   "bin": {

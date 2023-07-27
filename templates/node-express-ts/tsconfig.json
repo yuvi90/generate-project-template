@@ -1,27 +1,26 @@
 {
   "compilerOptions": {
     "target": "es2016",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "rootDir": "src",
     "outDir": "dist",
-    "baseUrl": "./",
+    "baseUrl": "./src",
     "paths": {
-      "@root/*": ["*"]
+      "@src/*": ["*"]
     },
-    "strict": true,
     "allowJs": true,
-    "esModuleInterop": true,
     "sourceMap": true,
     "resolveJsonModule": true,
     "removeComments": true,
     "noEmitOnError": true,
     "forceConsistentCasingInFileNames": true,
+    "strict": true,
     "noImplicitAny": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
     "noUnusedLocals": true
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "templates"]
+  "exclude": ["node_modules", "dist"]
 }

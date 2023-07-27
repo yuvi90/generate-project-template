@@ -2,12 +2,15 @@
   "name": "@dev.yuvi/generate-project-template",
   "version": "0.0.1",
   "description": "Simple project template generator.",
+  "bin": {
+    "create-template": "./dist/index.js"
+  },
   "main": "dist/index.js",
   "scripts": {
     "clean": "rimraf dist",
-    "build": "npm run clean && npx tsc -p tsconfig.json",
+    "build": "npm run clean && npx tsc",
     "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts"
+    "ts": "ts-node src/index.ts"
   },
   "keywords": [
     "project",
@@ -19,16 +22,20 @@
   ],
   "author": "Yuvraj Gill",
   "license": "MIT",
-  "homepage": "https://github.com/yuvi90/template-node-express.git#readme",
+  "homepage": "https://github.com/yuvi90/generate-project-template.git#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yuvi90/template-node-express.git"
+    "url": "git+https://github.com/yuvi90/generate-project-template.git"
   },
   "bugs": {
-    "url": "https://github.com/yuvi90/template-node-express.git/issues"
+    "url": "https://github.com/yuvi90/generate-project-template.git/issues"
   },
   "devDependencies": {
+    "@types/ejs": "^3.1.2",
+    "@types/inquirer": "^8.2.6",
     "@types/node": "^20.4.5",
+    "@types/shelljs": "^0.8.12",
+    "@types/yargs": "^17.0.24",
     "@typescript-eslint/eslint-plugin": "^6.2.0",
     "@typescript-eslint/parser": "^6.2.0",
     "eslint": "^8.45.0",
@@ -38,5 +45,11 @@
     "rimraf": "^5.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "ejs": "^3.1.9",
+    "inquirer": "^8.2.5",
+    "shelljs": "^0.8.5",
+    "yargs": "^17.7.2"
   }
 }

@@ -1,0 +1,13 @@
+{
+  "name": "<%= projectName %>",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "ts-node": "latest",
+    "typescript": "latest"
+  }
+}

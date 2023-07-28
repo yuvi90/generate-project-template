@@ -1,5 +1,5 @@
 {
-  "name": "@create/project-template",
+  "name": "@generate-project/template",
   "version": "0.0.1",
   "description": "Simple project template generator.",
   "type": "module",

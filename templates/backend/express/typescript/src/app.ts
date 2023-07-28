@@ -1,8 +1,9 @@
-import rateLimit from "express-rate-limit";
-import express from "express";
 import dotenv from "dotenv";
+import express from "express";
+import rateLimit from "express-rate-limit";
+import cors from "cors";
 import path from "path";
-import { router } from "@src/routes";
+import { router } from "./routes/index.js";
 
 // Define Environment
 dotenv.config();
@@ -10,7 +11,6 @@ dotenv.config();
 const app = express();
 
 // Enable CORS
-const cors = require("cors");
 app.use(cors());
 
 // Rate Limiting
@@ -22,7 +22,7 @@ app.use(limiter);
 app.set("trust proxy", 1);
 
 // Serve static files
-const staticPath = path.join(__dirname, "../public");
+const staticPath = path.join(process.cwd(), "public");
 app.use(express.static(staticPath));
 
 // Api Routes

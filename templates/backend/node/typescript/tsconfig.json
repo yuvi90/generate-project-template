@@ -6,9 +6,7 @@
     "rootDir": "src",
     "outDir": "dist",
     "baseUrl": "./",
-    "paths": {
-      "@root/*": ["*"]
-    },
+    "paths": {},
     "strict": true,
     "allowJs": true,
     "esModuleInterop": true,

@@ -1,95 +1,77 @@
 #!/usr/bin/env node
 
-const inquirer = require("inquirer");
-const shell = require("shelljs");
-const chalk = require("chalk");
-const path = require("path");
-const fs = require("fs");
+import inquirer from "inquirer";
+import shell from "shelljs";
+import ora from "ora";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 
-import { render } from "./utils/template";
+import {
+  promptQuestions,
+  Answers,
+  CliOptions,
+  TemplateConfig,
+} from "./utils/cliQuestions.js";
+import { TemplateData, render } from "./utils/template.js";
 
-// types
-interface TemplateConfig {
-  files?: string[];
-  postMessage?: string;
-}
-
-interface CliOptions {
-  projectName: string;
-  templateName: string;
-  templatePath: string;
-  targetPath: string;
-  config: TemplateConfig;
-}
-const ROOT_DIR = path.resolve(path.join(__dirname, ".."));
-const CURR_DIR = process.cwd();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const spinner = ora("Loading files");
+const rootDir = path.resolve(path.join(__dirname, ".."));
+const currentDir = process.cwd();
 
 main();
 
-// Main Function
+/*
+  Functions Declarations
+*/
+
+// Entry Point
 function main() {
-  // Templates dir folder names as choices array
-  const CHOICES: string[] = fs.readdirSync(path.join(ROOT_DIR, "templates"));
-
-  // Questions Array
-  const QUESTIONS = [
-    {
-      name: "projectChoice",
-      type: "list",
-      message: "What project template would you like to generate?",
-      choices: CHOICES,
-    },
-    {
-      name: "projectName",
-      type: "input",
-      message: "Enter the project's name:",
-      validate: (input: string) => {
-        if (/^([A-Za-z\-\_\d])+$/.test(input)) return true;
-        else
-          return "Project name may only include letters, numbers, underscores and hashes.";
-      },
-      default: "new-project",
-    },
-  ];
-
-  inquirer
-    .prompt(QUESTIONS)
-    .then(
-      ({
-        projectChoice,
-        projectName,
-      }: {
-        projectChoice: string;
-        projectName: string;
-      }) => {
-        const templatePath = path.join(ROOT_DIR, "templates", projectChoice);
-        const targetPath = path.join(CURR_DIR, projectName);
-        const templateConfig = getTemplateConfig(templatePath);
-
-        // Type of cli options
-        const options: CliOptions = {
-          projectName,
-          templateName: projectChoice,
-          templatePath,
-          targetPath,
-          config: templateConfig,
-        };
-
-        // Checks if project dir is created or not
-        if (!createProject(targetPath)) {
-          return;
-        }
-
-        // Writes files from template directory to target directory
-        createDirectoryContents(templatePath, projectName, templateConfig);
-
-        if (!postProcess(options)) {
-          return;
-        }
-
-        showMessage(options);
-      }
+  // Initiate Prompt
+  inquirer.prompt(promptQuestions).then((answers: Answers) => {
+    spinner.start();
+    const { projectName, projectType, projectFramework, jsVariant } = answers;
+    const templatePath: string = path.join(
+      rootDir,
+      "templates",
+      projectType.toLowerCase(),
+      projectFramework.toLowerCase(),
+      jsVariant.toLowerCase()
     );
+
+    // Getting custom template config if exited
+    const templateConfig = getTemplateConfig(templatePath);
+
+    // Check if project dir is created or not
+    const targetPath = path.join(currentDir, projectName);
+    if (!createProject(targetPath)) {
+      spinner.fail(`Folder already exists. Delete or use another name.`);
+      return;
+    }
+
+    // CLI Options
+    const cliOptions: CliOptions = {
+      userConfig: answers,
+      templateConfig: templateConfig,
+      templatePath,
+      targetPath,
+    };
+    // Writes files from template directory to target directory
+    createDirectoryContents(
+      templatePath,
+      projectName,
+      cliOptions.userConfig.projectDescription,
+      templateConfig
+    );
+
+    //TODO: Install npm packages on receiving argv
+
+    spinner.succeed(
+      `Done installing files.\n\nNow Run:\n\ncd ${cliOptions.userConfig.projectName}\nnpm install`
+    );
+  });
 }
 
 // Get custom config details
@@ -99,7 +81,6 @@ function getTemplateConfig(templatePath: string): TemplateConfig {
   if (!fs.existsSync(configPath)) return {};
 
   const templateConfigContent = fs.readFileSync(configPath);
-
   if (templateConfigContent) {
     return JSON.parse(templateConfigContent.toString());
   }
@@ -107,15 +88,11 @@ function getTemplateConfig(templatePath: string): TemplateConfig {
   return {};
 }
 
-// Create project dir
+// Checks and create project dir
 function createProject(projectPath: string) {
   if (fs.existsSync(projectPath)) {
-    console.log(
-      chalk.red(`Folder ${projectPath} exists. Delete or use another name.`)
-    );
     return false;
   }
-
   fs.mkdirSync(projectPath);
   return true;
 }
@@ -127,10 +104,10 @@ const SKIP_FILES = ["node_modules", ".template.json"];
 function createDirectoryContents(
   templatePath: string,
   projectName: string,
+  projectDescription: string,
   config: TemplateConfig
 ) {
   const filesToCreate: string[] = fs.readdirSync(templatePath);
-
   filesToCreate.forEach((file) => {
     const origFilePath = path.join(templatePath, file);
 
@@ -144,43 +121,44 @@ function createDirectoryContents(
       // Read buffer
       let contents = fs.readFileSync(origFilePath, "utf8");
 
+      const data: TemplateData = {
+        projectName,
+        projectDescription,
+      };
       // Dynamically add data to file via ejs
-      contents = render(contents, { projectName });
+      contents = render(contents, data);
 
       // Writing new file to target dir
-      const writePath = path.join(CURR_DIR, projectName, file);
+      const writePath = path.join(currentDir, projectName, file);
       fs.writeFileSync(writePath, contents, "utf8");
     } else if (stats.isDirectory()) {
       // if its dir than make dir recursively reads and writes
-      fs.mkdirSync(path.join(CURR_DIR, projectName, file));
+      fs.mkdirSync(path.join(currentDir, projectName, file));
 
       // recursive call
       createDirectoryContents(
         path.join(templatePath, file),
         path.join(projectName, file),
+        projectName,
         config
       );
     }
   });
 }
 
-// Checks and run if there is any post process
-function postProcess(options: CliOptions) {
-  if (isNode(options)) {
-    return postProcessNode(options);
-  }
-  return true;
-}
-
-// Checks if there is package json file to run process
+// Checks if package.json file exists to install packages
 function isNode(options: CliOptions) {
   return fs.existsSync(path.join(options.templatePath, "package.json"));
 }
 
-// Run Process
-function postProcessNode(options: CliOptions) {
-  shell.cd(options.targetPath);
+// Run npm or yarn to install packages
+function installNpmPkgs(options: CliOptions) {
+  if (!isNode(options)) {
+    spinner.fail("Missing package.json file.");
+    return false;
+  }
 
+  shell.cd(options.targetPath);
   let cmd = "";
 
   if (shell.which("yarn")) {
@@ -191,28 +169,10 @@ function postProcessNode(options: CliOptions) {
 
   if (cmd) {
     const result = shell.exec(cmd);
-
     if (result.code !== 0) {
+      spinner.fail("No yarn or npm found. Cannot run installation.");
       return false;
     }
-  } else {
-    console.log(chalk.red("No yarn or npm found. Cannot run installation."));
   }
-
   return true;
-}
-
-// Show post message if there is any
-function showMessage(options: CliOptions) {
-  console.log("");
-  console.log(chalk.green("Done."));
-  console.log(chalk.green(`Go into the project: cd ${options.projectName}`));
-
-  const message = options.config.postMessage;
-
-  if (message) {
-    console.log("");
-    console.log(chalk.yellow(message));
-    console.log("");
-  }
 }

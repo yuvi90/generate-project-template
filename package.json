@@ -1,7 +1,8 @@
 {
-  "name": "@yuvi92/generate-project-template",
+  "name": "@create/project-template",
   "version": "0.0.1",
   "description": "Simple project template generator.",
+  "type": "module",
   "bin": {
     "create-template": "./dist/index.js"
   },
@@ -49,6 +50,7 @@
   "dependencies": {
     "ejs": "^3.1.9",
     "inquirer": "^8.2.5",
+    "ora": "^6.3.1",
     "shelljs": "^0.8.5",
     "yargs": "^17.7.2"
   }

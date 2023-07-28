@@ -1,7 +1,7 @@
 {
   "name": "<%= projectName %>",
   "version": "1.0.0",
-  "description": "",
+  "description": "<%= projectDescription %>",
   "main": "dist/app.js",
   "scripts": {
     "clean": "rimraf dist",

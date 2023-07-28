@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "es2016",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "rootDir": "src",
     "outDir": "dist",
     "baseUrl": "./",
@@ -10,18 +10,18 @@
       "@root/*": ["*"]
     },
     "strict": true,
-    "allowJs": true,
-    "esModuleInterop": true,
     "sourceMap": true,
+    "allowJs": true,
     "resolveJsonModule": true,
-    "removeComments": true,
     "noEmitOnError": true,
+    "removeComments": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": false
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "templates"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "templates"],
+  "ts-node": { "esm": true }
 }
